@@ -46,13 +46,14 @@
 {{-   end -}}
 {{- end -}}
 
-{{- if stdinIsATTY -}}
-{{-   $email := promptStringOnce . "email" "What is your email address" -}}
-{{-   $name := promptStringOnce . "name" "What is your name" -}}
-{{- else -}}
-{{-   $email := "" -}}
-{{-   $name := "" -}}
-{{- end -}}
+{{ $name := "Tore Hammervoll" }}
+{{ $email := "" }}
+{{ if and stdinIsATTY (not $personal) }}
+{{   $email = promptString "email" }}
+{{ else }}
+{{   $email = "hammervoll.tore@gmail.com" }}
+{{ end }}
+
 
 [data]
     ephemeral = {{ $ephemeral }}
