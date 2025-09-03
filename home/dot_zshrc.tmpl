@@ -48,7 +48,7 @@ alias ls=eza
 {{- end }}
 
 {{ if lookPath "code" -}}
-export EDITOR=code
+export EDITOR="code --wait"
 {{ else -}}
 export EDITOR=nano
 {{ end -}}
