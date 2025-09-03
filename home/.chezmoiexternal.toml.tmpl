@@ -1,19 +1,5 @@
 {{ if not .ephemeral }}
 
-[".config/nvim/pack/twpayne/start/vim-igc"]
-    type = "archive"
-    url = "https://github.com/twpayne/vim-igc/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-
-[".config/nvim/pack/twpayne/start/vim-testscript"]
-    type = "archive"
-    url = "https://github.com/twpayne/vim-testscript/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-
 {{- if eq .osid "linux-ubuntu" }}
 
 [".local/bin/age"]
@@ -112,36 +98,5 @@
     refreshPeriod = "168h"
 {{-   end }}
 {{- end }}
-
-[".oh-my-zsh"]
-    type = "archive"
-    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-    exclude = [
-        "*/.*",
-        "*/templates",
-        "*/themes",
-    ]
-
-[".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
-    type = "archive"
-    url = "https://github.com/zsh-users/zsh-syntax-highlighting/archive/master.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
-    exclude = [
-        "*/.editorconfig",
-        "*/.gitattributes",
-        "*/.github",
-        "*/.gitignore",
-    ]
-
-[".oh-my-zsh/custom/themes/powerlevel10k"]
-    type = "archive"
-    url = "https://github.com/romkatv/powerlevel10k/archive/{{ (gitHubLatestRelease "romkatv/powerlevel10k").TagName }}.tar.gz"
-    exact = true
-    stripComponents = 1
 
 {{ end }}

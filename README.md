@@ -1,11 +1,11 @@
-# github.com/twpayne/dotfiles
+# github.com/skoging/dotfiles-chezmoi
 
-Tom Payne's dotfiles, managed with [`chezmoi`](https://github.com/twpayne/chezmoi).
+Tore Hammervolls's dotfiles, managed with [`chezmoi`](https://github.com/twpayne/chezmoi).
 
 Install them with:
 
 ```console
-$ chezmoi init twpayne
+$ chezmoi init skoging/dotfiles-chezmoi
 ```
 
 Personal secrets are stored in [1Password](https://1password.com) and you'll

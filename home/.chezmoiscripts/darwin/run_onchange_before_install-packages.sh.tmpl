@@ -10,7 +10,6 @@ set -eufo pipefail
      "dockutil"
      "eza"
      "fd"
-     "ffmpeg"
      "fzf"
      "gdu"
      "gh"
@@ -26,16 +25,10 @@ set -eufo pipefail
      "openjdk"
      "pinentry-mac"
      "pkg-config"
-     "postgis"
-     "postgresql@14"
-     "pspg"
      "ripgrep"
      "shellcheck"
-     "sqlc"
-     "tmux"
      "wget"
-     "xz"
-     "yt-dlp" -}}
+     "xz" -}}
 {{ $casks := list
      "1password-cli"
      "balenaetcher"
@@ -43,16 +36,9 @@ set -eufo pipefail
      "firefox"
      "ghostty"
      "hammerspoon"
-     "karabiner-elements"
-     "signal"
      "spotify"
-     "tailscale"
-     "telegram"
-     "transmission"
-     "vagrant"
      "visual-studio-code"
-     "vlc"
-     "whatsapp" -}}
+     "vlc" -}}
 
 brew bundle --file=/dev/stdin <<EOF
 {{ range ($brews | sortAlpha | uniq) -}}

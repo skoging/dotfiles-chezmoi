@@ -3,6 +3,7 @@
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
+{{- $wsl := false -}}{{/* true if this is running in windows subsystem for linux */}}
 {{- "" -}}
 
 {{- $osID := .chezmoi.os -}}
@@ -16,6 +17,13 @@
 {{-   $headless = true -}}
 {{- end -}}
 
+{{ if eq .chezmoi.os "linux" }}
+{{   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+{{-     $wsl = true -}}
+{{-     $headless = true -}}
+{{   end }}
+{{ end }}
+
 {{/* work around unreliable hostname on darwin */}}
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
@@ -27,13 +35,8 @@
 {{- end -}}
 
 {{- if not $ephemeral -}}
-{{-   if eq $hostname "macbook-air-m3" -}}
-{{-     $personal = true -}}
-{{-   else if eq $hostname "thinkpad" -}}
-{{-     $personal = true -}}
-{{-   else if eq $hostname "ubuntu" -}}
-{{-     $headless = true -}}
-{{-     $personal = true -}}
+{{-   if eq (trunc 5 $hostname) "EQDEV" -}}
+{{-     $work = true -}}
 {{-   else if stdinIsATTY -}}
 {{-     $headless = promptBoolOnce . "headless" "headless" -}}
 {{-     $ephemeral = promptBoolOnce . "ephemeral" "ephemeral" -}}
@@ -43,21 +46,29 @@
 {{-   end -}}
 {{- end -}}
 
-{{- $email := "twpayne@gmail.com" -}}
+{{- if stdinIsATTY -}}
+{{-   $email := promptStringOnce . "email" "What is your email address" -}}
+{{-   $name := promptStringOnce . "name" "What is your name" -}}
+{{- else -}}
+{{-   $email := "" -}}
+{{-   $name := "" -}}
+{{- end -}}
 
 [data]
     ephemeral = {{ $ephemeral }}
     email = {{ $email | quote }}
+    name = {{ $name | quote }}
     work = {{ $work }}
     headless = {{ $headless }}
     hostname = {{ $hostname | quote }}
     personal = {{ $personal }}
     osid = {{ $osID | quote }}
+    wsl = {{ $wsl }}
     zshPlugins = [
         "per-directory-history",
-        "vi-mode",
         "zsh-syntax-highlighting",
     ]
 
 [github]
     refreshPeriod = "12h"
+    

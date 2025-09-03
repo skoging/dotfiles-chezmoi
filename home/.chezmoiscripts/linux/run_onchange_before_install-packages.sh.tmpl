@@ -9,7 +9,6 @@
      "git"
      "git-lfs"
      "jq"
-     "libfuse2"
      "openssh-server"
      "ripgrep"
      "shellcheck"
@@ -25,19 +24,6 @@
 {{ if not .headless -}}
 {{   $packages = mustAppend $packages "xclip" -}}
 {{   $classicSnaps = mustAppend $classicSnaps "code" -}}
-{{ end -}}
-
-{{ if .personal -}}
-{{   $packages = mustAppend $packages "musl-tools" -}}
-{{   $classicSnaps = concat $classicSnaps (list "goreleaser" "snapcraft") -}}
-{{ end -}}
-
-{{ if and (eq .osid "linux-ubuntu") (not .ephemeral) -}}
-{{   $packages = concat $packages (list "gdal-bin" "libgeos-dev" "libproj-dev" "postgis" "postgresql") -}}
-{{ end -}}
-
-{{ if and (eq .osid "linux-ubuntu") (not .headless) (not .ephemeral) -}}
-{{   $packages = concat $packages (list "qgis") -}}
 {{ end -}}
 
 {{ $sudo := "sudo " -}}
