@@ -55,6 +55,13 @@
 {{   $email = "hammervoll.tore@gmail.com" }}
 {{ end }}
 
+{{ $onepasswordEnabled := false }}
+{{ if stdinIsATTY }}
+{{   $onepasswordEnabled = true }}
+{{ else if (env "OP_SERVICE_ACCOUNT_TOKEN ") }}
+{{   $onepasswordEnabled = true }}
+{{ end }}
+
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
@@ -67,6 +74,7 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
     personal = {{ $personal }}
     osid = {{ $osID | quote }}
     wsl = {{ $wsl }}
+    onepasswordEnabled = {{ $onepasswordEnabled }}
     zshPlugins = [
         "per-directory-history",
         "zsh-syntax-highlighting",
@@ -74,4 +82,10 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [github]
     refreshPeriod = "12h"
-    
+
+[onepassword]
+    {{ if (env "OP_SERVICE_ACCOUNT_TOKEN ") }}
+    mode = "service"
+    {{ else }}
+    mode = "account"
+    {{ end }}
