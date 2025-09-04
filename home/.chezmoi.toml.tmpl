@@ -58,7 +58,7 @@
 {{ $onepasswordEnabled := false }}
 {{ if stdinIsATTY }}
 {{   $onepasswordEnabled = true }}
-{{ else if (env "OP_SERVICE_ACCOUNT_TOKEN ") }}
+{{ else if (env "OP_SERVICE_ACCOUNT_TOKEN") }}
 {{   $onepasswordEnabled = true }}
 {{ end }}
 
