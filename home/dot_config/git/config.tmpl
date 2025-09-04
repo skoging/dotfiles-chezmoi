@@ -110,16 +110,3 @@
 	fsckobjects = true
 [trim]
 	bases = master,gh-pages
-{{- if .personal }}
-[url "git@github.com:chezmoi/"]
-	insteadOf = https://github.com/chezmoi/
-[url "git@github.com:twpayne/"]
-	insteadOf = https://github.com/twpayne/
-{{- end }}
-{{- $ghPath := lookPath "gh" }}
-{{- if $ghPath }}
-[credential "https://github.com"]
-	helper = !{{ $ghPath }} auth git-credential
-[credential "https://gist.github.com"]
-	helper = !{{ $ghPath }} auth git-credential
-{{- end }}
