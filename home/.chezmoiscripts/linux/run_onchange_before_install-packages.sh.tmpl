@@ -18,7 +18,10 @@
 {{ $classicSnaps := list -}}
 
 {{ if eq .osid "linux-ubuntu" -}}
-{{   $packages = mustAppend $packages "btop" -}}
+{{   if eq .chezmoi.osRelease.ubuntuCodename "focal" -}}
+{{   else -}}
+{{     $packages = mustAppend $packages "btop" -}}
+{{   end -}}
 {{ end -}}
 
 {{ if not .headless -}}
