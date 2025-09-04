@@ -84,7 +84,7 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
     refreshPeriod = "12h"
 
 [onepassword]
-    {{ if (env "OP_SERVICE_ACCOUNT_TOKEN ") }}
+    {{ if (env "OP_SERVICE_ACCOUNT_TOKEN") }}
     mode = "service"
     {{ else }}
     mode = "account"
