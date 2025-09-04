@@ -55,6 +55,7 @@
 {{   $email = "hammervoll.tore@gmail.com" }}
 {{ end }}
 
+sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
     ephemeral = {{ $ephemeral }}
