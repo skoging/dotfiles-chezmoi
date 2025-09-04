@@ -9,7 +9,6 @@
      "git"
      "git-lfs"
      "jq"
-     "openssh-server"
      "ripgrep"
      "shellcheck"
      "units"
@@ -22,6 +21,10 @@
 {{   else -}}
 {{     $packages = mustAppend $packages "btop" -}}
 {{   end -}}
+{{ end -}}
+
+{{ if not .ephemeral -}}
+{{   $packages = mustAppend $packages "openssh-server" -}}
 {{ end -}}
 
 {{ if not .headless -}}
