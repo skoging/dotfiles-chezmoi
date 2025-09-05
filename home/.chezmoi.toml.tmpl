@@ -60,9 +60,9 @@
 {{-   $personal = true -}}
 {{-   $work = true -}}
 {{-   $isClient = false -}}
-{{- else -}}
-{{-   $personal = promptBoolOnce . "personalFinal" "Is this a personal machine (not shared)" false -}}
-{{-   $work = promptBoolOnce . "workFinal" "Is this a work machine" false -}}
+{{- else if stdinIsATTY -}}
+{{-   $personal = promptBoolOnce . "personalFinal" "Is this a personal machine (not shared)" true -}}
+{{-   $work = promptBoolOnce . "workFinal" "Is this a work machine" true -}}
 {{-   if $work -}}
 {{-     $isClient = promptBoolOnce . "isClient" "Is this a client machine" true -}}
 {{-   else -}}
@@ -71,6 +71,8 @@
 {{-   if $isClient -}}
 {{-     $client = promptStringOnce . "finalClient" "'client' - What client name should be used to fetch secrets and config from 1password" "" -}}
 {{-   end -}}
+{{- else -}}
+{{-   writeToStdout "Could not detect machine type automatically. Please run 'chezmoi init' from the console to configure properly" -}}
 {{- end -}}
 
 {{- $onepasswordEnabled := false -}}
