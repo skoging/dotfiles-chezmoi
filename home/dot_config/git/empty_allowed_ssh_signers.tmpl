@@ -1,3 +1,3 @@
-{{ if .onepasswordEnabled }}
-{{ .email }} {{   onepasswordRead "op://Dev/SSH Personal 1pass/public key" }}
-{{ end }}
+{{- if .onepasswordEnabled -}}
+{{   onepasswordRead (list "op://Dev/" .onepasswordNotes "/email" | join "") }} {{   onepasswordRead "op://Dev/SSH Personal 1pass/public key" }}
+{{ end -}}

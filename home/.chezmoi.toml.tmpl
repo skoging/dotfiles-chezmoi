@@ -1,6 +1,7 @@
 {{/* boolean feature tags */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
+{{- $client := false -}}{{/* true if this machine is a client machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $wsl := false -}}{{/* true if this is running in windows subsystem for linux */}}
@@ -11,12 +12,12 @@
 {{-   $osID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
 {{- end -}}
 
-{{ if eq .chezmoi.os "linux" }}
-{{   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") -}}
 {{-     $wsl = true -}}
 {{-     $headless = true -}}
-{{   end }}
-{{ end }}
+{{-   end -}}
+{{- end -}}
 
 {{/* detect GitHub codespaces, VSCode remote containers, Docker containers, Multipass VMs, and Vagrant boxes */}}
 {{- if or (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode") -}}
@@ -36,9 +37,7 @@
 {{- end -}}
 
 {{- if not $ephemeral -}}
-{{-   if eq (trunc 5 $hostname) "EQDEV" -}}
-{{-     $work = true -}}
-{{-   else if stdinIsATTY -}}
+{{-   if stdinIsATTY -}}
 {{-     $headless = promptBoolOnce . "headless" "headless" -}}
 {{-     $ephemeral = promptBoolOnce . "ephemeral" "ephemeral" -}}
 {{-   else -}}
@@ -47,20 +46,44 @@
 {{-   end -}}
 {{- end -}}
 
-{{ $name := "Tore Hammervoll" }}
-{{ $email := "" }}
-{{ if and stdinIsATTY (not $personal) }}
-{{   $email = promptString "email" }}
-{{ else }}
-{{   $email = "hammervoll.tore@gmail.com" }}
-{{ end }}
 
-{{ $onepasswordEnabled := false }}
-{{ if stdinIsATTY }}
-{{   $onepasswordEnabled = true }}
-{{ else if (env "OP_SERVICE_ACCOUNT_TOKEN") }}
-{{   $onepasswordEnabled = true }}
-{{ end }}
+{{- if (env "CODESPACES") -}}
+{{-   $work = true -}}
+{{-   $client = regexFind "^[^/]+" (env "GITHUB_REPOSITORY") -}}
+{{-   $personal = true -}}
+{{- else if hasPrefix $hostname "EQDEV" -}}
+{{-   $work = true -}}
+{{-   $client = "equinor" -}}
+{{-   $personal = true -}}
+{{ else if eq $hostname "MacBook Pro 16" }}
+{{-   $work = true -}}
+{{-   $personal = true -}}
+{{- end -}}
+
+
+{{- $name := "Tore Hammervoll" -}}
+{{- $email := "" -}}
+{{- if and stdinIsATTY (not $personal) -}}
+{-{   $email = promptString "email" -}}
+{{- else -}}
+{{-   $email = "hammervoll.tore@gmail.com" -}}
+{{- end -}}
+
+{{- $onepasswordEnabled := false -}}
+{{- if stdinIsATTY -}}
+{{-   $onepasswordEnabled = true -}}
+{{- else if (env "OP_SERVICE_ACCOUNT_TOKEN") -}}
+{{-   $onepasswordEnabled = true -}}
+{{- end -}}
+
+{{- $onepasswordNotes := "Unknown Machine" -}}
+{{- if and $work $client  -}}
+{{-   $onepasswordNotes = cat "Work Machine -" $client -}}
+{{- else if $work  -}}
+{{-   $onepasswordNotes = "Work Machine" -}}
+{{- else if $personal -}}
+{{-   $onepasswordNotes = "Personal Machine" -}}
+{{- end -}}
 
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
@@ -69,12 +92,14 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
     email = {{ $email | quote }}
     name = {{ $name | quote }}
     work = {{ $work }}
+    client = {{ $client | quote }}
     headless = {{ $headless }}
     hostname = {{ $hostname | quote }}
     personal = {{ $personal }}
     osid = {{ $osID | quote }}
     wsl = {{ $wsl }}
     onepasswordEnabled = {{ $onepasswordEnabled }}
+    onepasswordNotes = {{ $onepasswordNotes | quote }}
     zshPlugins = [
         "per-directory-history",
         "zsh-syntax-highlighting",
