@@ -1,7 +1,7 @@
 {{/* boolean feature tags */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
-{{- $client := false -}}{{/* true if this machine is a client machine */}}
+{{- $client := "" -}}{{/* true if this machine is a client machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $wsl := false -}}{{/* true if this is running in windows subsystem for linux */}}
@@ -55,7 +55,7 @@
 {{-   $work = true -}}
 {{-   $client = "equinor" -}}
 {{-   $personal = true -}}
-{{ else if eq $hostname "MacBook Pro 16" }}
+{{- else if eq $hostname "MacBook Pro 16" -}}
 {{-   $work = true -}}
 {{-   $personal = true -}}
 {{- end -}}
@@ -64,7 +64,7 @@
 {{- $name := "Tore Hammervoll" -}}
 {{- $email := "" -}}
 {{- if and stdinIsATTY (not $personal) -}}
-{-{   $email = promptString "email" -}}
+{{   $email = promptString "email" -}}
 {{- else -}}
 {{-   $email = "hammervoll.tore@gmail.com" -}}
 {{- end -}}
