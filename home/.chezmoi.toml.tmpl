@@ -1,7 +1,8 @@
 {{/* boolean feature tags */}}
 {{- $ephemeral := false -}}{{/* true if this machine is ephemeral, e.g. a cloud or VM instance */}}
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
-{{- $client := "" -}}{{/* true if this machine is a client machine */}}
+{{- $isClient := true -}}{{/* true if this machine is a client machine */}}
+{{- $client := "" -}}{{/* name of the clint this machine belongs to */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $wsl := false -}}{{/* true if this is running in windows subsystem for linux */}}
@@ -48,25 +49,28 @@
 
 
 {{- if (env "CODESPACES") -}}
+{{-   $personal = true -}}
 {{-   $work = true -}}
 {{-   $client = regexFind "^[^/]+" (env "GITHUB_REPOSITORY") -}}
-{{-   $personal = true -}}
 {{- else if hasPrefix $hostname "EQDEV" -}}
+{{-   $personal = true -}}
 {{-   $work = true -}}
 {{-   $client = "equinor" -}}
-{{-   $personal = true -}}
 {{- else if eq $hostname "MacBook Pro 16" -}}
-{{-   $work = true -}}
 {{-   $personal = true -}}
-{{- end -}}
-
-
-{{- $name := "Tore Hammervoll" -}}
-{{- $email := "" -}}
-{{- if and stdinIsATTY (not $personal) -}}
-{{   $email = promptString "email" -}}
+{{-   $work = true -}}
+{{-   $isClient = false -}}
 {{- else -}}
-{{-   $email = "hammervoll.tore@gmail.com" -}}
+{{-   $personal = promptBoolOnce . "personalFinal" "Is this a personal machine (not shared)" false -}}
+{{-   $work = promptBoolOnce . "workFinal" "Is this a work machine" false -}}
+{{-   if $work -}}
+{{-     $isClient = promptBoolOnce . "isClient" "Is this a client machine" true -}}
+{{-   else -}}
+{{-     $isClient = false -}}
+{{-   end -}}
+{{-   if $isClient -}}
+{{-     $client = promptStringOnce . "finalClient" "'client' - What client name should be used to fetch secrets and config from 1password" "" -}}
+{{-   end -}}
 {{- end -}}
 
 {{- $onepasswordEnabled := false -}}
@@ -77,7 +81,7 @@
 {{- end -}}
 
 {{- $onepasswordNotes := "Unknown Machine" -}}
-{{- if and $work $client  -}}
+{{- if and $work (ne $client "")  -}}
 {{-   $onepasswordNotes = cat "Work Machine -" $client -}}
 {{- else if $work  -}}
 {{-   $onepasswordNotes = "Work Machine" -}}
@@ -89,8 +93,6 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
     ephemeral = {{ $ephemeral }}
-    email = {{ $email | quote }}
-    name = {{ $name | quote }}
     work = {{ $work }}
     client = {{ $client | quote }}
     headless = {{ $headless }}
@@ -104,6 +106,15 @@ sourceDir = {{ .chezmoi.sourceDir | quote }}
         "per-directory-history",
         "zsh-syntax-highlighting",
     ]
+    {{ if or (ne $client "") (not $isClient) -}}
+    isClient = {{ $isClient }}
+    finalClient = {{ $client | quote }}
+    {{- end }}
+    {{ if stdinIsATTY -}}
+    personalFinal = {{ $personal }}
+    workFinal = {{ $work }}
+    {{- end }}
+
 
 [github]
     refreshPeriod = "12h"

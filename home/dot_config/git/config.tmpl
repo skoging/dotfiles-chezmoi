@@ -2,10 +2,6 @@
 [user]
 	name = {{   onepasswordRead (list "op://Dev/" .onepasswordNotes "/name" | join "") }}
 	email = {{   onepasswordRead (list "op://Dev/" .onepasswordNotes "/email" | join "") }}
-{{- else -}}
-[user]
-	name = {{ .name }}
-	email = {{ .email }}
 {{- end }}
 [advice]
 	addEmptyPathspec = false
