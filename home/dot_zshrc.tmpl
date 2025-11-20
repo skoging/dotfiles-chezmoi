@@ -60,7 +60,17 @@ alias fd=fdfind
 {{- end }}
 {{- if lookPath "eza" }}
 alias ls=eza
+alias ll="eza -l"
+alias la="eza -la"
+alias lt="eza -l --tree"
+alias lta="eza -la --tree"
+{{- else }}
+alias ll="ls -lh"
+alias la="ls -lAh"
 {{- end }}
+{{ if env "CODESPACES" -}}
+alias az="CODESPACES=false az"
+{{ end -}}
 
 {{ if lookPath "code" -}}
 export EDITOR="code --wait"
