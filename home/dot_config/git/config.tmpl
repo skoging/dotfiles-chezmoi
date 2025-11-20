@@ -1,12 +1,15 @@
 {{- if .onepasswordEnabled -}}
 [user]
+	signingkey = {{   onepasswordRead "op://Dev/SSH Personal 1pass/public key" }}
 	name = {{   onepasswordRead (list "op://Dev/" .onepasswordNotes "/name" | join "") }}
 	email = {{   onepasswordRead (list "op://Dev/" .onepasswordNotes "/email" | join "") }}
 {{- end }}
+
 [advice]
 	addEmptyPathspec = false
 	pushNonFastForward = false
 	statusHints = false
+
 [alias]
 	a = add
 	ap = add -p
@@ -32,7 +35,7 @@
 	mbhom = merge-base HEAD origin/master
 	mff = merge --ff-only
 	ol = log --pretty=oneline
-	l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	l = log --graph --pretty=format:'%Cred%h%Creset %C(auto)%G?%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	p = push
 	pf = push --force-with-lease
 	prb = pull --rebase
@@ -55,67 +58,104 @@
 	pending = codereview pending
 	submit = codereview submit
 	sync = codereview sync
+
 [branch]
 	sort = -committerdate
+
 [column]
 	ui = auto
+
 [core]
 	editor = nvim
 	whitespace = trailing-space,space-before-tab
+
 [diff]
 	algorithm = histogram
 	colorMoved = plain
 	renamelimit = 8192
 	renames = true
+
 [fetch]
 	all = true
 	fsckobjects = false
 	prune = true
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
 [gitget]
 	root = ~/src
+
 {{ if .personal -}}
 [http]
 	cookiefile = ~/.config/git/cookies
 {{ end -}}
+
 [init]
 	defaultBranch = master
+
 [merge]
 	conflictStyle = zdiff3
+
 [pager]
 	branch = false
 	grep = false
+
 [pull]
 	rebase = true
+
 [push]
 	autoSetupRemote = true
 	default = current
+
 [rebase]
 	autoSquash = true
 	autoStash = true
 	updateRefs = true
+
 [receive]
 	fsckobjects = true
+
 {{ if eq .chezmoi.os "windows" -}}
 [safe]
 	directory = {{ .chezmoi.workingTree }}
 {{ end -}}
+
 [status]
 	submoduleSummary = true
+
 [tag]
 	sort = version:refname
+
 [transfer]
 	fsckobjects = true
+
 [trim]
 	bases = master,gh-pages
+
 [gpg "ssh"]
 	allowedSignersFile = ~/.config/git/allowed_ssh_signers
 
-{{ if not (env "CODESPACES") }}
+{{- if and .wsl (lookPath "op-ssh-sign.exe") }}
+	program = op-ssh-sign.exe
+
+[gpg]
+	format = ssh
+
+[commit]
+	gpgsign = true
+
+[core]
+	sshCommand = ssh.exe
+
+{{- end }}
+
+{{ if not (env "CODESPACES") -}}
+{{ if or (not .wsl) (and .wsl (lookPath "op-ssh-sign.exe")) -}}
 [url "git@github.com:"]
 	insteadOf = https://github.com/
-{{ end }}
+{{ end -}}
+{{ end -}}
