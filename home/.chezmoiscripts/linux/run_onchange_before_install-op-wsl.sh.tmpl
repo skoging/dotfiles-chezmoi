@@ -1,0 +1,35 @@
+{{ if and (eq .osid "linux-ubuntu") .wsl -}}
+#!/bin/bash
+
+# Create a wrapper script for 1Password CLI in WSL that connects to the Windows version
+# This allows WSL to use the Windows 1Password app for authentication
+
+OP_WRAPPER_DIR="{{ .chezmoi.homeDir }}/.local/bin"
+OP_WRAPPER_PATH="${OP_WRAPPER_DIR}/op"
+
+# Create the directory if it doesn't exist
+mkdir -p "${OP_WRAPPER_DIR}"
+
+# Create the op wrapper script
+cat > "${OP_WRAPPER_PATH}" << 'EOF'
+#!/usr/bin/env bash
+
+# Wrapper script to call Windows op.exe from WSL
+# This forwards OP_* environment variables to Windows using WSLENV
+
+# Collect all OP_* environment variable names
+mapfile -d '' op_env_vars < <(env -0 | grep -z ^OP_ | cut -z -d= -f1)
+
+# Export WSLENV with all OP_* variables to forward them to Windows
+export WSLENV="${WSLENV:-}:$(IFS=:; echo "${op_env_vars[*]}")"
+
+# Call the Windows op.exe with all arguments
+exec op.exe "$@"
+EOF
+
+# Make the wrapper executable
+chmod +x "${OP_WRAPPER_PATH}"
+
+echo "1Password CLI WSL wrapper installed at ${OP_WRAPPER_PATH}"
+echo "Make sure 1Password for Windows is installed and ~/.local/bin is in your PATH"
+{{ end -}}

@@ -4,6 +4,7 @@ set -eufo pipefail
 
 {{ $brews := list
      "age"
+     "atuin"
      "bat"
      "btop"
      "curl"
@@ -26,9 +27,13 @@ set -eufo pipefail
      "pinentry-mac"
      "pkg-config"
      "ripgrep"
+     "rust"
      "shellcheck"
      "wget"
-     "xz" -}}
+     "xz"
+     "zoxide"
+     "zsh-autosuggestions"
+     "zsh-syntax-highlighting" -}}
 {{ $casks := list
      "1password-cli"
      "balenaetcher"

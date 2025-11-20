@@ -33,6 +33,21 @@ setopt autocd
 setopt histignorespace
 setopt rm_star_silent
 
+# History configuration
+HISTFILE="${XDG_STATE_HOME}/zsh/history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
+setopt sharehistory
+setopt incappendhistory
+setopt hist_ignore_dups
+setopt hist_ignore_all_dups
+setopt hist_find_no_dups
+setopt hist_save_no_dups
+
+# Create history directory if it doesn't exist
+mkdir -p "$(dirname "$HISTFILE")"
+
 alias g=git
 alias gnp="git --no-pager"
 {{- if lookPath "bat" }}
@@ -67,6 +82,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 {{ end }}
 
+[ -f "$XDG_CONFIG_HOME/zsh/autosuggestions.zsh" ] && source "$XDG_CONFIG_HOME/zsh/autosuggestions.zsh"
+[ -f "$XDG_CONFIG_HOME/zsh/history.zsh" ] && source "$XDG_CONFIG_HOME/zsh/history.zsh"
+[ -f "$XDG_CONFIG_HOME/zsh/zoxide.zsh" ] && source "$XDG_CONFIG_HOME/zsh/zoxide.zsh"
+[ -f "$XDG_CONFIG_HOME/zsh/syntax-highlighting.zsh" ] && source "$XDG_CONFIG_HOME/zsh/syntax-highlighting.zsh"
 
 {{- if lookPath "starship" }}
 eval "$(starship init zsh)"

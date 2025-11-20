@@ -1,0 +1,22 @@
+{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+#!/bin/bash
+
+set -eufo pipefail
+
+if ! command -v cargo &> /dev/null; then
+  echo "Installing Rust..."
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+  source "$HOME/.cargo/env"
+fi
+
+if ! command -v atuin &> /dev/null; then
+  echo "Installing atuin..."
+  cargo install atuin
+fi
+
+if ! command -v zoxide &> /dev/null; then
+  echo "Installing zoxide..."
+  cargo install zoxide --locked
+fi
+
+{{ end -}}

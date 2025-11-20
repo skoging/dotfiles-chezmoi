@@ -1,0 +1,24 @@
+if command -v atuin &>/dev/null; then
+  eval "$(atuin init zsh --disable-up-arrow)"
+elif command -v fzf &>/dev/null; then
+  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+  if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+  elif [ -f /usr/share/fzf/key-bindings.zsh ]; then
+    source /usr/share/fzf/key-bindings.zsh
+  elif [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+  fi
+
+  fzf-history-widget-custom() {
+    local selected
+    selected=$(fc -rl 1 | awk '{$1="";print substr($0,2)}' | fzf --tac --no-sort --query "$LBUFFER")
+    if [ -n "$selected" ]; then
+      LBUFFER=$selected
+    fi
+    zle redisplay
+  }
+  zle -N fzf-history-widget-custom
+  bindkey '^R' fzf-history-widget-custom
+fi
