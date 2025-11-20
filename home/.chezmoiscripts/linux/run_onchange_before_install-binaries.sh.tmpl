@@ -1,0 +1,43 @@
+{{ if eq .osid "linux-debian" "linux-raspbian" "linux-ubuntu" -}}
+#!/bin/bash
+
+set -eufo pipefail
+
+INSTALL_DIR="$HOME/.local/bin"
+mkdir -p "$INSTALL_DIR"
+
+# Install atuin from pre-built binary
+if ! command -v atuin &> /dev/null; then
+  echo "Installing atuin..."
+  ATUIN_VERSION=$(curl -s https://api.github.com/repos/atuinsh/atuin/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+  ATUIN_URL="https://github.com/atuinsh/atuin/releases/download/v${ATUIN_VERSION}/atuin-x86_64-unknown-linux-gnu.tar.gz"
+  ATUIN_CHECKSUM_URL="https://github.com/atuinsh/atuin/releases/download/v${ATUIN_VERSION}/atuin-x86_64-unknown-linux-gnu.tar.gz.sha256"
+  
+  cd /tmp
+  curl -sL "$ATUIN_URL" -o atuin.tar.gz
+  curl -sL "$ATUIN_CHECKSUM_URL" -o atuin.tar.gz.sha256
+  
+  echo "$(cat atuin.tar.gz.sha256) atuin.tar.gz" | sha256sum -c -
+  tar xzf atuin.tar.gz
+  mv atuin-*/atuin "$INSTALL_DIR/"
+  rm -rf atuin.tar.gz atuin.tar.gz.sha256 atuin-*
+  
+  echo "Atuin installed successfully"
+fi
+
+# Install zoxide from pre-built binary
+if ! command -v zoxide &> /dev/null; then
+  echo "Installing zoxide..."
+  ZOXIDE_VERSION=$(curl -s https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest | grep -Po '"tag_name": "v\K[^"]*')
+  ZOXIDE_URL="https://github.com/ajeetdsouza/zoxide/releases/download/v${ZOXIDE_VERSION}/zoxide-${ZOXIDE_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+  
+  cd /tmp
+  curl -sL "$ZOXIDE_URL" -o zoxide.tar.gz
+  tar xzf zoxide.tar.gz
+  mv zoxide "$INSTALL_DIR/"
+  rm -rf zoxide.tar.gz
+  
+  echo "Zoxide installed successfully"
+fi
+
+{{ end -}}
