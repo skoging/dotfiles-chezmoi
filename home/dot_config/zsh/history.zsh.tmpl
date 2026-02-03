@@ -1,5 +1,9 @@
 if command -v atuin &>/dev/null; then
-  eval "$(atuin init zsh)"
+#   eval "$(atuin init zsh)"
+
+  unset HISTFILE
+  eval "$(atuin init zsh --disable-up-arrow)"
+  fc -R =(atuin search --cmd-only --limit 100 --filter-mode host)
 elif command -v fzf &>/dev/null; then
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
