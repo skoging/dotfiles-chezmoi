@@ -6,6 +6,19 @@
     executable = true
     path = "age/age"
 
+[".local/bin/atuin"]
+    type = "archive-file"
+    url = {{ gitHubLatestReleaseAssetURL "atuinsh/atuin" "atuin-x86_64-unknown-linux-gnu.tar.gz" | quote }}
+    executable = true
+    stripComponents = 1
+    path = "atuin"
+
+[".local/bin/zoxide"]
+    type = "archive-file"
+    url = {{ gitHubLatestReleaseAssetURL "ajeetdsouza/zoxide" "zoxide-*-x86_64-unknown-linux-musl.tar.gz" | quote }}
+    executable = true
+    path = "zoxide"
+
 [".local/bin/age-keygen"]
     type = "archive-file"
     url = {{ gitHubLatestReleaseAssetURL "FiloSottile/age" (printf "age-*-%s-%s.tar.gz" .chezmoi.os .chezmoi.arch) | quote }}
