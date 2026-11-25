@@ -3,18 +3,13 @@ export XDG_CONFIG_HOME=$HOME/.config
 export XDG_STATE_HOME=$HOME/.local/state
 export XDG_CACHE_HOME=$HOME/.cache
 
-# If you come from bash you might have to change your $PATH.
-{{- $paths := list }}
-{{- $homeDir := .chezmoi.homeDir }}
-{{- range $_, $relPath := list "bin" "go/bin" ".cargo/bin" ".local/bin" }}
-{{    $path := joinPath $homeDir $relPath }}
-{{-   if stat $path }}
-{{-     $paths = mustAppend $paths $path }}
-{{-   end }}
-{{- end }}
-{{- if $paths }}
-export PATH={{ toStrings $paths | join ":" }}:$PATH
-{{- end }}
+# Tool checks run at shell startup, not template render time, so tools that
+# chezmoi installs during the same apply (e.g. in Codespaces) are picked up.
+for _p in "$HOME/.local/bin" "$HOME/.cargo/bin" "$HOME/go/bin" "$HOME/bin"; do
+  [ -d "$_p" ] && PATH="$_p:$PATH"
+done
+unset _p
+export PATH
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -50,33 +45,34 @@ mkdir -p "$(dirname "$HISTFILE")"
 
 alias g=git
 alias gnp="git --no-pager"
-{{- if lookPath "bat" }}
-alias cat=bat
-{{- else if lookPath "batcat" }}
-alias cat=batcat
-{{- end }}
-{{- if lookPath "fdfind" }}
-alias fd=fdfind
-{{- end }}
-{{- if lookPath "eza" }}
-alias ls=eza
-alias ll="eza -l"
-alias la="eza -la"
-alias lt="eza -l --tree"
-alias lta="eza -la --tree"
-{{- else }}
-alias ll="ls -lh"
-alias la="ls -lAh"
-{{- end }}
+if command -v bat &>/dev/null; then
+  alias cat=bat
+elif command -v batcat &>/dev/null; then
+  alias cat=batcat
+fi
+if command -v fdfind &>/dev/null; then
+  alias fd=fdfind
+fi
+if command -v eza &>/dev/null; then
+  alias ls=eza
+  alias ll="eza -l"
+  alias la="eza -la"
+  alias lt="eza -l --tree"
+  alias lta="eza -la --tree"
+else
+  alias ll="ls -lh"
+  alias la="ls -lAh"
+fi
 {{ if env "CODESPACES" -}}
 alias az="CODESPACES=false az"
 {{ end -}}
 
-{{ if lookPath "code" -}}
-export EDITOR="code --wait"
-{{ else -}}
-export EDITOR=nano
-{{ end -}}
+if command -v code &>/dev/null; then
+  export EDITOR="code --wait"
+else
+  export EDITOR=nano
+fi
+
 {{ if not .ephemeral -}}
 {{ end -}}
 export GOBIN=$HOME/.local/bin
@@ -86,17 +82,18 @@ export LANG=en_US.UTF-8
 export RIPGREP_CONFIG_PATH=~/.config/ripgrep/config
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
-{{ if stat (joinPath .chezmoi.homeDir ".nvm") }}
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-{{ end }}
+if [ -d "$HOME/.nvm" ]; then
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
 
 [ -f "$XDG_CONFIG_HOME/zsh/autosuggestions.zsh" ] && source "$XDG_CONFIG_HOME/zsh/autosuggestions.zsh"
 [ -f "$XDG_CONFIG_HOME/zsh/history.zsh" ] && source "$XDG_CONFIG_HOME/zsh/history.zsh"
 [ -f "$XDG_CONFIG_HOME/zsh/zoxide.zsh" ] && source "$XDG_CONFIG_HOME/zsh/zoxide.zsh"
 [ -f "$XDG_CONFIG_HOME/zsh/syntax-highlighting.zsh" ] && source "$XDG_CONFIG_HOME/zsh/syntax-highlighting.zsh"
 
-{{- if lookPath "starship" }}
-eval "$(starship init zsh)"
-{{ end -}}
+
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+fi
